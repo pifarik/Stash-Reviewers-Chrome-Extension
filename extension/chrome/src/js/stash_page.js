@@ -1543,6 +1543,7 @@
 	], function(PullRequestsTable, jQuery) {
 		'use strict';
 		function redefinePullRequestTable() {
+
 			//redefined filter builder to include new parameters
 			PullRequestsTable.prototype.buildUrl = function (start, limit) {
 				const self = this;
@@ -1649,6 +1650,38 @@
 							$buildCell.data('pullrequestid', $row.data('pullrequestid'));
 							$row.append($buildCell);
 						}
+					});
+
+				    var $ = jQuery,
+				        minCrossApproves = 2,
+				        mandatoryReviewers = ["AndreiN", "YaroslavS", "MaximG"];
+
+					rows.each(function(_index, row){
+
+				        var $this = $(row),
+				            $id = $this.find("td.id a"),
+				 
+				            /* Reviewers */
+				            $reviewers = $this.find("td.reviewers"),
+				            crossPassed = $this.find("td.reviewers span[data-username]").find(".badge.approved").length >= minCrossApproves,
+				            needWork = $reviewers.find(".badge.needs-work").length,
+				            mandatoryApproves = 0;
+
+				        $this.find(".tmp-plugin").remove();
+				 
+				        /* Reviewers */
+				        for (var i = 0; i < mandatoryReviewers.length; i++) {
+				            mandatoryApproves += $this.find("td.reviewers span[data-username=\"" + mandatoryReviewers[i] + "\"]").find(".badge.approved").length;
+				        }
+				        if (needWork) {
+				            $reviewers.prepend("<strong class='tmp-plugin need-work'>NeedWork</strong>");
+				        } else if (mandatoryApproves) {
+				            $reviewers.prepend("<strong class='tmp-plugin approved'>Approved</strong>");
+				        } else if (crossPassed ) {
+				            $reviewers.prepend("<strong class='tmp-plugin cross-passed'>CrossPassed</strong>");
+				        } else {
+				            $reviewers.prepend("<strong class='tmp-plugin need-cross'>NeedCross</strong>");
+				        }
 					});
 
 					// add data to build cell
@@ -1991,6 +2024,31 @@
 			$reviewersInput.data('select2').blur();
 			$participantsInput.data('select2').blur();
 			$approversInput.data('select2').blur();
+
+			var $header = jQuery("div.aui-page-header-main h2"),
+				filterButton = function(text, handler) {
+		            var button = jQuery("<button class='tmp-plugin'/>");
+		            button.text(text);
+		            button.click(function() {
+		            	jQuery("tr.pull-request-row").each(function() {
+		                    var $row = jQuery(this);
+		                    if (handler($row)){
+		                        $row.show();
+		                    } else {
+		                        $row.hide();
+		                    };
+		                });
+		            });
+		            return button;
+		        };
+
+		    /* Add filter buttons */
+		    $header.append(filterButton("Approved", function(x) { return x.find("strong.tmp-plugin.approved").length; }));
+		    $header.append(filterButton("Mandatory Review", function(x) { return x.find("strong.tmp-plugin.cross-passed").length; }));
+		    $header.append(filterButton("Cross Review", function(x) { return x.find("strong.tmp-plugin.need-cross").length; }));
+		    $header.append(filterButton("Need Work", function(x) { return x.find("strong.tmp-plugin.need-work").length; }));
+		    $header.append(filterButton("No Version", function(x) { return x.find("strong.tmp-plugin.no-version").length; }));
+		    $header.append(filterButton("All", function(x) { return true; }));
 		}
 
 		return {
