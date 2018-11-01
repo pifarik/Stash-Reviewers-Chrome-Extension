@@ -2027,7 +2027,7 @@
 
 			var $header = jQuery("div.aui-page-header-main h2"),
 				filterButton = function(text, handler) {
-		            var button = jQuery("<button class='tmp-plugin'/>");
+		            var button = jQuery("<button class='tmp-plugin aui-button'/>");
 		            button.text(text);
 		            button.click(function() {
 		            	jQuery("tr.pull-request-row").each(function() {
@@ -2043,12 +2043,12 @@
 		        };
 
 		    /* Add filter buttons */
+		    $header.append(filterButton("All", function(x) { return true; }));
 		    $header.append(filterButton("Approved", function(x) { return x.find("strong.tmp-plugin.approved").length; }));
 		    $header.append(filterButton("Mandatory Review", function(x) { return x.find("strong.tmp-plugin.cross-passed").length; }));
 		    $header.append(filterButton("Cross Review", function(x) { return x.find("strong.tmp-plugin.need-cross").length; }));
 		    $header.append(filterButton("Need Work", function(x) { return x.find("strong.tmp-plugin.need-work").length; }));
 		    $header.append(filterButton("No Version", function(x) { return x.find("strong.tmp-plugin.no-version").length; }));
-		    $header.append(filterButton("All", function(x) { return true; }));
 		}
 
 		return {
