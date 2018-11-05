@@ -1664,7 +1664,6 @@
 				            /* Reviewers */
 				            $reviewers = $this.find("td.reviewers"),
 				            crossPassed = $this.find("td.reviewers span[data-username]").find(".badge.approved").length >= minCrossApproves,
-				            needWork = $reviewers.find(".badge.needs-work").length,
 				            mandatoryApproves = 0;
 
 				        $this.find(".tmp-plugin").remove();
@@ -1673,9 +1672,7 @@
 				        for (var i = 0; i < mandatoryReviewers.length; i++) {
 				            mandatoryApproves += $this.find("td.reviewers span[data-username=\"" + mandatoryReviewers[i] + "\"]").find(".badge.approved").length;
 				        }
-				        if (needWork) {
-				            $reviewers.prepend("<strong class='tmp-plugin need-work'>NeedWork</strong>");
-				        } else if (mandatoryApproves) {
+				        if (mandatoryApproves) {
 				            $reviewers.prepend("<strong class='tmp-plugin approved'>Approved</strong>");
 				        } else if (crossPassed ) {
 				            $reviewers.prepend("<strong class='tmp-plugin cross-passed'>CrossPassed</strong>");
@@ -2047,8 +2044,6 @@
 		    $header.append(filterButton("Approved", function(x) { return x.find("strong.tmp-plugin.approved").length; }));
 		    $header.append(filterButton("Mandatory Review", function(x) { return x.find("strong.tmp-plugin.cross-passed").length; }));
 		    $header.append(filterButton("Cross Review", function(x) { return x.find("strong.tmp-plugin.need-cross").length; }));
-		    $header.append(filterButton("Need Work", function(x) { return x.find("strong.tmp-plugin.need-work").length; }));
-		    $header.append(filterButton("No Version", function(x) { return x.find("strong.tmp-plugin.no-version").length; }));
 		}
 
 		return {
