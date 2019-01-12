@@ -491,9 +491,52 @@
 			jQuery(markDownHelp[0]).before($button);
 		}
 
+		function injectImFeelingLuckyCreateButton(){
+			const $reviewersInput = jQuery('#s2id_reviewers');
+			if ($reviewersInput.length == 0) {
+				return;
+			}
+
+			const buttonHTML = '<button class="aui-button aui-button-primary" type="button" title="Random filter out reviewers">I\'m feeling lucky</button>'
+
+			const $button = jQuery(buttonHTML);
+
+			$button.click(function(e) {
+				e.preventDefault();
+
+				const allReviewers = AJS.$('#reviewers').auiSelect2("data");
+
+				AJS.$('#reviewers').auiSelect2("data", null).trigger("change");
+				AJS.$('#reviewers').auiSelect2("val", null).trigger("change");
+
+				const changeEvent = new jQuery.Event("change");
+				changeEvent.removed = true;
+				AJS.$('#reviewers').trigger(changeEvent);
+
+				const usersToReviewCount = 3;
+				var filteredReviewers = [];
+				for (var i = 0; i < usersToReviewCount && allReviewers.length > 0; i++) {
+					var addingReviewerIndex =  Math.floor(Math.random() * allReviewers.length);
+
+					const e = new jQuery.Event("change");
+					e.added = allReviewers[addingReviewerIndex];
+					AJS.$('#reviewers').trigger(e);
+
+					filteredReviewers.push(allReviewers[addingReviewerIndex]);
+					allReviewers.splice(addingReviewerIndex, 1);
+				}
+
+				AJS.$('#reviewers').auiSelect2("data", filteredReviewers);
+			});
+
+			const markDownHelp = jQuery('#submit-form');
+			jQuery(markDownHelp[0]).before($button);
+		}
+
 		return {
 			injectTemplateButton,
-			injectReviewersDropdown
+			injectReviewersDropdown,
+			injectImFeelingLuckyCreateButton
 		};
 	});
 
@@ -2148,6 +2191,7 @@
 								prCreateUtil.injectTemplateButton(template);
 							if(window.featuresData.reviewersgroup == 1)
 								prCreateUtil.injectReviewersDropdown(jsonGroups);
+							prCreateUtil.injectImFeelingLuckyCreateButton();
 						});
 
 						// PR Filter
@@ -2205,6 +2249,7 @@
 									prCreateUtil.injectTemplateButton(template);
 								if(window.featuresData.reviewersgroup == 1)
 									prCreateUtil.injectReviewersDropdown(jsonGroups);
+								prCreateUtil.injectImFeelingLuckyCreateButton();
 							}
 						});
 					}
